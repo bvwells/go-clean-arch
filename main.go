@@ -59,11 +59,6 @@ func main() {
 	flag.Usage = usage
 	flag.Parse()
 
-	if *config == "" {
-		fmt.Fprintf(os.Stderr, "error: config file was not specified")
-		return
-	}
-
 	if err := readConfig(); err != nil {
 		scanner.PrintError(os.Stderr, err)
 		return
@@ -160,7 +155,7 @@ func processFile(filename string, in io.Reader, out io.Writer, stdin bool) error
 				continue
 			} else {
 				if importLayerIndex > cleanArchLayerIndex {
-					fmt.Printf("Error in clean architecture!!!!")
+					fmt.Printf("Error in clean architecture in file %s.\n!", filename)
 				}
 			}
 		}
