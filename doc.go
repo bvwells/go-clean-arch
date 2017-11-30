@@ -6,8 +6,7 @@
   	go-clean-arch [flags] [path ...]
   
   The flags are:
-  	-c  Config file containing list of clean architecture layers from
-        inner layers to outer laters.  
+  	-c  Config file containing list of clean architecture layers from inner layers to outer laters.  
     
   Examples
   
