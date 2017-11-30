@@ -101,25 +101,20 @@ func readConfig() error {
 
 	if _, err := os.Stat(*config); err != nil {
 		return err
-	} else {
-		f, err := os.Open(*config)
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-
-		layerIndex := 1
-		scanner := bufio.NewScanner(f)
-		for scanner.Scan() {
-			layers[scanner.Text()] = layerIndex
-			layerIndex++
-		}
-		if scanner.Err() != nil {
-			return err
-		}
 	}
-	fmt.Printf("%v\n", layers)
-	return nil
+	f, err := os.Open(*config)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	
+	layerIndex := 1
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		layers[scanner.Text()] = layerIndex
+		layerIndex++
+	}
+	return scanner.Err()
 }
 
 // If in == nil, the source is the contents of the file with the given filename.
