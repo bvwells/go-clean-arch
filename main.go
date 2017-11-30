@@ -102,7 +102,7 @@ func readConfig() error {
 		return err
 	}
 	defer f.Close()
-	
+
 	layerIndex := 1
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
