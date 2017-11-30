@@ -6,3 +6,17 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/bvwells/go-clean-arch)](https://goreportcard.com/report/github.com/bvwells/go-clean-arch)
 
 Linter for enforcing clean architecture principles in Go.
+
+## Installation
+
+Install go-clean-arch with the following command:
+
+```
+go get -u github.com/bvwells/go-clean-arch
+```
+
+## Go Versions Supported
+
+The most recent major version of Go is supported. You can see which versions are
+currently supported by looking at the lines following `go:` in
+[`.travis.yml`](.travis.yml).
