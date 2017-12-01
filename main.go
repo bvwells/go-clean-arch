@@ -106,7 +106,9 @@ func readConfig() error {
 	layerIndex := 1
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
-		layers[scanner.Text()] = layerIndex
+		layer := filepath.ToSlash(scanner.Text())
+
+		layers[layer] = layerIndex
 		layerIndex++
 	}
 	return scanner.Err()
@@ -124,12 +126,9 @@ func processFile(filename string, in io.Reader, out io.Writer, stdin bool) error
 		in = f
 	}
 	filename, _ = filepath.Abs(filename)
-	cleanArchLayer, err := getBaseDirectory(filename)
-	if err != nil {
-		return nil
-	}
-	cleanArchLayerIndex, okay := layers[cleanArchLayer]
-	if !okay {
+	packagePath := getPackage(filename)
+	cleanArchLayerIndex := getCleanArchLayerIndex(packagePath)
+	if cleanArchLayerIndex == 0 {
 		return nil
 	}
 
@@ -137,48 +136,35 @@ func processFile(filename string, in io.Reader, out io.Writer, stdin bool) error
 	if err != nil {
 		return err
 	}
-
-	//	fmt.Printf("Parsing file: %s\n", filename)
 	file, err := parser.ParseFile(fileSet, filename, src, parser.ParseComments)
 	if err != nil {
 		return err
 	}
 	for _, imp := range file.Imports {
 		importPath := strings.Trim(imp.Path.Value, `"`)
-		if importLayer, err := getBasePackage(importPath); err != nil {
-			continue
-		} else {
-			fmt.Printf("comparing clean arch package %s to import %s\n", cleanArchLayer, importLayer)
-
-			importLayerIndex, found := layers[importLayer]
-			if !found {
-				continue
-			} else {
-				if importLayerIndex > cleanArchLayerIndex {
-					fmt.Printf("Error in clean architecture in file %s.\n!", filename)
-				}
-			}
+		importLayerIndex := getCleanArchLayerIndex(importPath)
+		if importLayerIndex > cleanArchLayerIndex {
+			fmt.Printf("Error in clean architecture in file %s\n", filename)
 		}
 	}
 
 	return nil
 }
 
-func getBasePackage(importPath string) (string, error) {
-	index := strings.Index(importPath, "/")
-	if index == -1 {
-		return "", errors.New("base directory does not exist")
+func getCleanArchLayerIndex(importPath string) int {
+	for k, v := range layers {
+		length := len(k)
+		if len(importPath) >= length && importPath[0:length] == k {
+			return v
+		}
 	}
-	return importPath[0:index], nil
+	return 0
 }
 
-func getBaseDirectory(filename string) (string, error) {
+func getPackage(filename string) string {
 	relativePath := strings.Replace(filename, basePath, "", 1)
 	relativePath = strings.TrimLeft(relativePath, string(os.PathSeparator))
-	index := strings.Index(relativePath, string(os.PathSeparator))
-	// return if no base directory.
-	if index == -1 {
-		return "", errors.New("base directory does not exist")
-	}
-	return relativePath[0:index], nil
+	relativePath = filepath.Dir(relativePath)
+	relativePath = filepath.ToSlash(relativePath)
+	return relativePath
 }
