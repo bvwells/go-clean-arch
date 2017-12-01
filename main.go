@@ -117,6 +117,13 @@ func readConfig() error {
 // If in == nil, the source is the contents of the file with the given filename.
 func processFile(filename string, in io.Reader, out io.Writer, stdin bool) error {
 
+	filename, _ = filepath.Abs(filename)
+	packagePath := getPackage(filename)
+	cleanArchLayerIndex := getCleanArchLayerIndex(packagePath)
+	if cleanArchLayerIndex == 0 {
+		return nil
+	}
+
 	if in == nil {
 		f, err := os.Open(filename)
 		if err != nil {
@@ -125,26 +132,22 @@ func processFile(filename string, in io.Reader, out io.Writer, stdin bool) error
 		defer f.Close()
 		in = f
 	}
-	filename, _ = filepath.Abs(filename)
-	packagePath := getPackage(filename)
-	cleanArchLayerIndex := getCleanArchLayerIndex(packagePath)
-	if cleanArchLayerIndex == 0 {
-		return nil
-	}
 
 	src, err := ioutil.ReadAll(in)
 	if err != nil {
 		return err
 	}
+
 	file, err := parser.ParseFile(fileSet, filename, src, parser.ParseComments)
 	if err != nil {
 		return err
 	}
+
 	for _, imp := range file.Imports {
 		importPath := strings.Trim(imp.Path.Value, `"`)
 		importLayerIndex := getCleanArchLayerIndex(importPath)
 		if importLayerIndex > cleanArchLayerIndex {
-			fmt.Printf("Error in clean architecture in file %s\n", filename)
+			fmt.Printf("error: bad dependency on '%s' in layer '%s' ('%s')\n", importPath, packagePath, filename)
 		}
 	}
 
