@@ -5,7 +5,10 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/ea2u4hpy555b6ady?svg=true)](https://ci.appveyor.com/project/bvwells/go-clean-arch)
 [![Go Report Card](https://goreportcard.com/badge/github.com/bvwells/go-clean-arch)](https://goreportcard.com/report/github.com/bvwells/go-clean-arch)
 
-Linter for enforcing clean architecture principles in Go.
+Linter for enforcing clean architecture principles in Go. The linter reports violations of clean architecture dependency rules by checking go imports 
+within packages against user defined dependency rules.
+
+For more information on 'The Clean Architecture Principle' see [Clean Architecture](https://8thlight.com/blog/uncle-bob/2012/08/13/the-clean-architecture.html) by Uncle Bob. The article [Applying The Clean Architecture To Go Applications](http://manuel.kiessling.net/2012/09/28/applying-the-clean-architecture-to-go-applications/) by Manual Kiessling is useful understand how clean architecture can be applied to Go applications.
 
 ## Installation
 
