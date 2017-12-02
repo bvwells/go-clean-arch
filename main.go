@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bufio"
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -103,15 +103,12 @@ func readConfig() error {
 	}
 	defer f.Close()
 
-	layerIndex := 1
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		layer := filepath.ToSlash(scanner.Text())
-
-		layers[layer] = layerIndex
-		layerIndex++
+	file, err := ioutil.ReadFile(*config)
+	if err != nil {
+		return err
 	}
-	return scanner.Err()
+
+	return json.Unmarshal(file, &layers)
 }
 
 // If in == nil, the source is the contents of the file with the given filename.

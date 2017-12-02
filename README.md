@@ -28,8 +28,8 @@ go-clean-arch [flags] [path ...]
 
 where the flags are defined as:
 
-    -c  Config file containing list of clean architecture layers from
-        inner layers to outer laters.
+    -c  Config file containing list of clean architecture layers with hierarchy
+        index from inner layers to outer layers.
 
 ## Example
 
@@ -42,16 +42,18 @@ git clone https://github.com/ManuelKiessling/go-cleanarchitecture
 Run the linter with the command:
 
 ```
-go-clean-arch -c layers.cfg path-to-repo\go-cleanarchitecture\src
+go-clean-arch -c layers.json path-to-repo\go-cleanarchitecture\src
 ```
 
 where the layers config file contains the clean architecture layers:
 
 ```
-domain
-usecases
-interfaces
-infrastructure
+{
+    "domain": 1,
+    "usecases": 2,
+    "interfaces": 3,
+    "infrastructure": 4
+}
 ```
 
 ## Go Versions Supported
