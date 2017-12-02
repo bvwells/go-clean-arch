@@ -97,11 +97,6 @@ func readConfig() error {
 	if _, err := os.Stat(*config); err != nil {
 		return err
 	}
-	f, err := os.Open(*config)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
 
 	file, err := ioutil.ReadFile(*config)
 	if err != nil {
