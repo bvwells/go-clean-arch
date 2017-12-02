@@ -23,7 +23,7 @@ go get -u github.com/bvwells/go-clean-arch
 To invoke go-clean arch use the command:
 
 ```
-go-clean-arch [flags] [path ...]
+go-clean-arch [flags] [path]
 ```
 
 where the flags are defined as:

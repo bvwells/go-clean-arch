@@ -2,7 +2,7 @@
 Go-clean-arch is a linter for enforcing clean architecture principles in Go.
 
 Usage:
-  go-clean-arch [flags] [path ...]
+  go-clean-arch [flags] [path]
 
   The flags are:
     -c  Config file containing list of clean architecture layers with hierarchy
