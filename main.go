@@ -38,7 +38,7 @@ func visitFile(path string, f os.FileInfo, err error) error {
 		err = processFile(path, nil, os.Stdout, false)
 	}
 	// Don't complain if a file was deleted in the meantime (i.e.
-	// the directory changed concurrently while running gofmt).
+	// the directory changed concurrently while running).
 	if err != nil && !os.IsNotExist(err) {
 		fmt.Printf("Encountered error: %v\n", err)
 	}
