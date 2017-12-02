@@ -18,10 +18,7 @@ import (
 var (
 	// main options
 	config = flag.String("c", "", "config file")
-)
 
-var (
-	fileSet  = token.NewFileSet()
 	layers   = map[string]int{}
 	basePath = ""
 )
@@ -50,7 +47,7 @@ func walkDir(path string) {
 }
 
 func usage() {
-	fmt.Fprintf(os.Stderr, "usage: go-clean-arch [flags] [path ...]\n")
+	fmt.Fprintf(os.Stderr, "usage: go-clean-arch [flags] [path]\n")
 	flag.PrintDefaults()
 }
 
@@ -64,27 +61,22 @@ func main() {
 		return
 	}
 
-	if flag.NArg() == 0 {
-		fmt.Fprintf(os.Stderr, "error: no arguments specified.")
+	if flag.NArg() != 1 {
+		fmt.Fprintf(os.Stderr, "error: no arguments specified, expecting one")
 		return
 	}
 
-	for i := 0; i < flag.NArg(); i++ {
-		path := flag.Arg(i)
-		basePath, _ = filepath.Abs(path)
-		switch dir, err := os.Stat(path); {
-		case err != nil:
-			scanner.PrintError(os.Stderr, err)
-			return
-		case dir.IsDir():
-			walkDir(path)
-		default:
-			if err := processFile(path, nil, os.Stdout, false); err != nil {
-				scanner.PrintError(os.Stderr, err)
-				return
-			}
-		}
+	basePath, _ = filepath.Abs(flag.Arg(0))
+	switch dir, err := os.Stat(basePath); {
+	case err != nil:
+		scanner.PrintError(os.Stderr, err)
+		return
+	case dir.IsDir():
+		walkDir(basePath)
+	default:
+		fmt.Fprintf(os.Stderr, "error: can not use go-clean-arch on a single file")
 	}
+
 	os.Exit(0)
 }
 
@@ -130,7 +122,8 @@ func processFile(filename string, in io.Reader, out io.Writer, stdin bool) error
 		return err
 	}
 
-	file, err := parser.ParseFile(fileSet, filename, src, parser.ParseComments)
+	fileSet := token.NewFileSet()
+	file, err := parser.ParseFile(fileSet, filename, src, parser.ImportsOnly)
 	if err != nil {
 		return err
 	}
