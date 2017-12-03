@@ -4,12 +4,12 @@ Go-clean-arch is a linter for enforcing clean architecture principles in Go.
 The linter reports violations of clean architecture dependency rules by checking go imports 
 within packages against user defined dependency rules.
 
-Usage:
+Usage
   go-clean-arch [flags] [path]
 
-  The flags are:
-    -c  Config file containing list of clean architecture layers with hierarchy
-        index from inner layers to outer laters.
+The flags are:
+  -c  Config file containing list of clean architecture layers with hierarchy
+      index from inner layers to outer laters.
 
 Examples
 
