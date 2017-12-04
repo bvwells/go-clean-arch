@@ -1,7 +1,7 @@
 /*
 Go-clean-arch is a linter for enforcing clean architecture principles in Go.
 
-The linter reports violations of clean architecture dependency rules by checking go imports 
+The linter reports violations of clean architecture dependency rules by checking go imports
 within packages against user defined dependency rules.
 
 Usage
@@ -16,7 +16,7 @@ Examples
 To check go source code folder containing clean architecture layers:
 
   go-clean-arch -c config.json path
-    
+
 The go-clean-arch linter can be run on the Git repo https://github.com/ManuelKiessling/go-cleanarchitecture by cloning the repo using the command;
 
   git clone https://github.com/ManuelKiessling/go-cleanarchitecture

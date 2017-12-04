@@ -8,7 +8,6 @@ import (
 	"go/parser"
 	"go/scanner"
 	"go/token"
-	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -32,7 +31,7 @@ func isGoFile(f os.FileInfo) bool {
 
 func visitFile(path string, f os.FileInfo, err error) error {
 	if err == nil && isGoFile(f) {
-		err = processFile(path, nil, os.Stdout, false)
+		err = processFile(path)
 	}
 	// Don't complain if a file was deleted in the meantime (i.e.
 	// the directory changed concurrently while running).
@@ -90,16 +89,21 @@ func readConfig() error {
 		return err
 	}
 
-	file, err := ioutil.ReadFile(*config)
+	file, err := os.Open(*config)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	b, err := ioutil.ReadAll(file)
 	if err != nil {
 		return err
 	}
 
-	return json.Unmarshal(file, &layers)
+	return json.Unmarshal(b, &layers)
 }
 
-// If in == nil, the source is the contents of the file with the given filename.
-func processFile(filename string, in io.Reader, out io.Writer, stdin bool) error {
+func processFile(filename string) error {
 
 	filename, _ = filepath.Abs(filename)
 	packagePath := getPackage(filename)
@@ -108,16 +112,13 @@ func processFile(filename string, in io.Reader, out io.Writer, stdin bool) error
 		return nil
 	}
 
-	if in == nil {
-		f, err := os.Open(filename)
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-		in = f
+	f, err := os.Open(filename)
+	if err != nil {
+		return err
 	}
+	defer f.Close()
 
-	src, err := ioutil.ReadAll(in)
+	src, err := ioutil.ReadAll(f)
 	if err != nil {
 		return err
 	}
