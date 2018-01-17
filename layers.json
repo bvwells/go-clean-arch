@@ -1,6 +1,6 @@
 {
-    "domain": 1,
-    "usecases": 2,
-    "interfaces": 3,
-    "infrastructure": 4
+    "bumblebee-backend/domain": 1,
+    "bumblebee-backend/usecases": 2,
+    "bumblebee-backend/interfaces": 3,
+    "bumblebee-backend/infrastructure": 4
 }

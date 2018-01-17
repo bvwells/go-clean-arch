@@ -5,45 +5,17 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"go/parser"
-	"go/scanner"
-	"go/token"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 var (
 	// main options
 	config = flag.String("c", "", "config file")
 
-	layers   = map[string]int{}
-	basePath = ""
+	layers = map[string]int{}
 )
-
-// isGoFile determines whether a file is a Go file.
-func isGoFile(f os.FileInfo) bool {
-	// ignore non-Go files
-	name := f.Name()
-	return !f.IsDir() && !strings.HasPrefix(name, ".") && strings.HasSuffix(name, ".go")
-}
-
-func visitFile(path string, f os.FileInfo, err error) error {
-	if err == nil && isGoFile(f) {
-		err = processFile(path)
-	}
-	// Don't complain if a file was deleted in the meantime (i.e.
-	// the directory changed concurrently while running).
-	if err != nil && !os.IsNotExist(err) {
-		fmt.Printf("Encountered error: %v\n", err)
-	}
-	return nil
-}
-
-func walkDir(path string) {
-	filepath.Walk(path, visitFile)
-}
 
 func usage() {
 	fmt.Fprintf(os.Stderr, "usage: go-clean-arch [flags] [path]\n")
@@ -56,7 +28,7 @@ func main() {
 	flag.Parse()
 
 	if err := readConfig(); err != nil {
-		scanner.PrintError(os.Stderr, err)
+		fmt.Fprintf(os.Stderr, err.Error())
 		return
 	}
 
@@ -65,13 +37,14 @@ func main() {
 		return
 	}
 
-	basePath, _ = filepath.Abs(flag.Arg(0))
-	switch dir, err := os.Stat(basePath); {
+	path, _ := filepath.Abs(flag.Arg(0))
+	switch dir, err := os.Stat(path); {
 	case err != nil:
-		scanner.PrintError(os.Stderr, err)
+		fmt.Fprintf(os.Stderr, err.Error())
 		return
 	case dir.IsDir():
-		walkDir(basePath)
+		processor := NewProcessor(path)
+		processor.Process()
 	default:
 		fmt.Fprintf(os.Stderr, "error: can not use go-clean-arch on a single file")
 	}
@@ -101,59 +74,4 @@ func readConfig() error {
 	}
 
 	return json.Unmarshal(b, &layers)
-}
-
-func processFile(filename string) error {
-
-	filename, _ = filepath.Abs(filename)
-	packagePath := getPackage(filename)
-	cleanArchLayerIndex := getCleanArchLayerIndex(packagePath)
-	if cleanArchLayerIndex == 0 {
-		return nil
-	}
-
-	f, err := os.Open(filename)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	src, err := ioutil.ReadAll(f)
-	if err != nil {
-		return err
-	}
-
-	fileSet := token.NewFileSet()
-	file, err := parser.ParseFile(fileSet, filename, src, parser.ImportsOnly)
-	if err != nil {
-		return err
-	}
-
-	for _, imp := range file.Imports {
-		importPath := strings.Trim(imp.Path.Value, `"`)
-		importLayerIndex := getCleanArchLayerIndex(importPath)
-		if importLayerIndex > cleanArchLayerIndex {
-			fmt.Printf("error: bad dependency on '%s' in layer '%s' ('%s')\n", importPath, packagePath, filename)
-		}
-	}
-
-	return nil
-}
-
-func getCleanArchLayerIndex(importPath string) int {
-	for k, v := range layers {
-		length := len(k)
-		if len(importPath) >= length && importPath[0:length] == k {
-			return v
-		}
-	}
-	return 0
-}
-
-func getPackage(filename string) string {
-	relativePath := strings.Replace(filename, basePath, "", 1)
-	relativePath = strings.TrimLeft(relativePath, string(os.PathSeparator))
-	relativePath = filepath.Dir(relativePath)
-	relativePath = filepath.ToSlash(relativePath)
-	return relativePath
 }
