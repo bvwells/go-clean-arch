@@ -1,4 +1,4 @@
-# go-clean-arch
+# Go Clean Architecture
 
 [![GoDoc](http://godoc.org/github.com/bvwells/go-clean-arch?status.svg)](http://godoc.org/github.com/bvwells/go-clean-arch)
 [![Build Status](https://travis-ci.org/bvwells/go-clean-arch.svg?branch=master)](https://travis-ci.org/bvwells/go-clean-arch)
