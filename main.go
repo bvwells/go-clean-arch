@@ -41,8 +41,8 @@ func visitFile(path string, f os.FileInfo, err error) error {
 	return nil
 }
 
-func walkDir(path string) {
-	filepath.Walk(path, visitFile)
+func walkDir(path string) error {
+	return filepath.Walk(path, visitFile)
 }
 
 func usage() {
@@ -71,7 +71,9 @@ func main() {
 		scanner.PrintError(os.Stderr, err)
 		return
 	case dir.IsDir():
-		walkDir(basePath)
+                if err := walkDir(basePath); err != nil {
+                        return
+                }
 	default:
 		fmt.Fprintf(os.Stderr, "error: can not use go-clean-arch on a single file")
 	}
