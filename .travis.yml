@@ -17,7 +17,7 @@ install:
   
 script:
  - ./test.sh
- - go vet ./...
+ - golangci-lint run ./...
  - diff <(golint ./...) <(printf "")
 
 after_success:
