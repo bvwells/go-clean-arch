@@ -71,9 +71,9 @@ func main() {
 		scanner.PrintError(os.Stderr, err)
 		return
 	case dir.IsDir():
-                if err := walkDir(basePath); err != nil {
-                        return
-                }
+		if err := walkDir(basePath); err != nil {
+			return
+		}
 	default:
 		fmt.Fprintf(os.Stderr, "error: can not use go-clean-arch on a single file")
 	}
