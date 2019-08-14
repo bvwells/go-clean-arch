@@ -14,8 +14,8 @@ install:
   - curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.17.1
   
 script:
- - ./test.sh
  - golangci-lint run ./...
+ - ./test.sh
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
